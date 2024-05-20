@@ -1,7 +1,3 @@
-# demo-repo-
+#  face regnition 
 
-Same Description!
-
-##SubHeader
-
-watch tutorial on Youtubr
+## learnage used php ,javascript 
