@@ -57,7 +57,22 @@ class User {
             return "Error: " . $stmt->error;
         }
     }
+
+    public function userExists($link) {
+        $stmt = $link->prepare("SELECT * FROM UserDetails WHERE emailAddress = ? OR idNumber = ?");
+        $stmt->bind_param("ss", $this->email, $this->idNumber);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        
+        if ($result->num_rows > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+     // Static method to initialize a User object from the database using an email address
+    
 }
 
 ?>
- 
