@@ -26,12 +26,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Check if the user already exists
     if ($user->userExists($link)) {
         echo "Error: User with this email or ID number already exists.";
+        header('Location: ../sign.html');
     } else {
         // Save the user to the database
         $result = $user->saveToDatabase($link);
 
         // Output the result
         echo $result;
+        header('Location: ../password.html');
     }
 
     
@@ -39,7 +41,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Close the database connection
     $link->close();
     //require_once '../password.html'
-    header('Location: ../password.html');
+   
 } else {
     echo "Invalid request method.";
 }

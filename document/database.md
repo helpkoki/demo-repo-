@@ -28,4 +28,13 @@ CREATE TABLE UserDetails (
     idNumber VARCHAR(10) NOT NULL
 );
 
+CREATE TABLE Login (
+    login_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES UserDetails(id),
+    UNIQUE (email)
+);
+
 

@@ -48,6 +48,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                 if ($stmt->execute()) {
                     echo "Password registered successfully.";
+                    header("Location: ../index.html");
+                   // header ("Location: ../User_DashBoard/index.php");
                 } else {
                     echo "Error: " . $stmt->error;
                 }
@@ -57,7 +59,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $link->close();
             } else {
                 // If passwords do not match, redirect back to the password form
-                header('Location: ../password.html');
+                header("Location: ../password.html");
                 exit();
             }
         } 
