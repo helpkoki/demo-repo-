@@ -2,34 +2,37 @@
 session_start(); // Start the session
 
 // Include the database connection script
-require_once '../database-config/';
+require_once '../database-config/config.php';
 
 // Check if the form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Get form data
-    $firstName = $_POST['firstName'];
-    $lastName = $_POST['lastName'];
-    $birthday = $_POST['birthdayDate'];
-    $gender = $_POST['gender'];
-    $email = $_POST['emailAddress'];
-    $phone = $_POST['phoneNumber'];
-    $idNumber = $_POST['idNumber'];
+    
+    $firstName = isset($_POST['firstName']) ? $_POST['firstName'] : '';
+    $lastName = isset($_POST['lastName']) ? $_POST['lastName'] : '';
+    $birthday = isset($_POST['birthdayDate']) ? $_POST['birthdayDate'] : '';
+    $gender = isset($_POST['gender']) ? $_POST['gender'] : ''; // New address input
+    $phone = isset($_POST['phoneNumber']) ? $_POST['phoneNumber'] : 'other';
+    $email = isset($_POST['emailAddress']) ? $_POST['emailAddress'] : '';
+    $idNumber = isset($_POST['IdNumber']) ? $_POST['IdNumber'] : '';
 
     // Prepare and bind
-    $stmt = $conn->prepare("INSERT INTO UserDetails (firstName, lastName, birthday, gender, emailAddress, phoneNumber, idNumber) VALUES (?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("sssssss", $firstName, $lastName, $birthday, $gender, $email, $phone, $idNumber);
+    $stmt = mysqli_prepare($link, "INSERT INTO UserDetails (firstName, lastName, birthday, gender, emailAddress, phoneNumber, idNumber) VALUES (?, ?, ?, ?, ?, ?, ?)");
+    mysqli_stmt_bind_param($stmt, "sssssss", $firstName, $lastName, $birthday, $gender, $email, $phone, $idNumber);
 
     // Execute the statement
-    if ($stmt->execute()) {
+    if (mysqli_stmt_execute($stmt)) {
         echo "New record created successfully";
     } else {
-        echo "Error: " . $stmt->error;
+        echo "Error: " . mysqli_stmt_error($stmt);
     }
 
-    // Close the statement and connection
-    $stmt->close();
-    $conn->close();
+    // Close the statement
+    mysqli_stmt_close($stmt);
 } else {
     echo "Invalid request method.";
 }
+
+// Close the connection
+mysqli_close($link);
 ?>
