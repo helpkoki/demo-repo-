@@ -38,3 +38,16 @@ CREATE TABLE Login (
 );
 
 
+
+USE databas;
+
+CREATE TABLE images (
+    user_id INT,
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    image LONGBLOB NOT NULL,
+    image_type VARCHAR(255) NOT NULL,
+    image_size INT NOT NULL,
+    image_name VARCHAR(255) NOT NULL,
+
+);
+

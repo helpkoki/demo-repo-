@@ -67,8 +67,8 @@ session_start();
                     </div>
                     <div class="sb-sidenav-footer">
                         <div class="small">
-                        <?php if (isset($_SESSION['firstName']) && isset($_SESSION['lastName'])) {
-                echo htmlspecialchars($_SESSION['firstName']) . " " . htmlspecialchars($_SESSION['lastName']);
+                        <?php if (isset($_SESSION['user_username'])) {
+                echo htmlspecialchars($_SESSION['user_username']);
             } else {
                 echo "Guest";
             }
@@ -107,9 +107,9 @@ session_start();
                             </div>
                             <div class="col-xl-3 col-md-6">
                                 <div class="card bg-success text-white mb-4">
-                                    <div class="card-body">Out for delivery</div>
+                                    <div class="card-body">Register Images</div>
                                     <div class="card-footer d-flex align-items-center justify-content-between">
-                                        <a class="small text-white stretched-link" href="#">View Details</a>
+                                        <a class="small text-white stretched-link" href="../image/index.php">Images</a>
                                         <div class="small text-white"><i class="fas fa-angle-right"></i></div>
                                     </div>
                                 </div>
