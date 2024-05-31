@@ -2,7 +2,7 @@
 require_once '../database-config/config.php';
 require_once '../Model/User.php'; // Include the User class
 require_once '../Model/myTools.php'; // Include the User class
-
+session_start();
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Check if file was uploaded without errors
     if (isset($_FILES["image"]) && $_FILES["image"]["error"] == 0) {
