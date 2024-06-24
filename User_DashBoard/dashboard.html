@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bank Dashboard</title>
+</head>
+<body>
+    <h1>Dashboard</h1>
+    <h2>Balance: <span id="balance"></span></h2>
+    <button onclick="location.href='send_money.html'">Send Money</button>
+    <button onclick="location.href='withdraw_money.html'">Withdraw Money</button>
+    <button onclick="location.href='deposit_money.html'">Deposit Money</button>
+    <button onclick="location.href='view_balance.html'">Balance</button>
+    <h3>Transaction History</h3>
+    <ul id="transactions"></ul>
+
+    <script>
+        // Function to fetch and display balance and transaction history
+        function loadDashboard() {
+            fetch('api/dashboard.php')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('balance').innerText = data.balance;
+                    var balance =data.balance;
+                    const transactions = data.transactions.map(tx => `<li>${tx.type} - ${tx.amount} - ${tx.created_at}</li>`).join('');
+                    document.getElementById('transactions').innerHTML = transactions;
+                });
+        }
+
+        // Function to speak out the options
+        function speak(text, callback) {
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.onend = callback;
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // Function to start voice command recognition
+        function startVoiceCommand() {
+            if (!('webkitSpeechRecognition' in window)) {
+                alert('Your browser does not support speech recognition. Please use Chrome or another supported browser.');
+                return;
+            }
+
+            var recognition = new webkitSpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.lang = 'en-US';
+
+            recognition.onresult = function(event) {
+                var command = event.results[0][0].transcript.toLowerCase();
+                if (command.includes('send money')) {
+                    location.href = 'send_money.html';
+                } else if (command.includes('withdraw money')) {
+                    location.href = 'withdraw_money.html';
+                } else if (command.includes('deposit money')) {
+                    location.href = 'deposit_money.html';
+                } else if (command.includes('balance')) {
+                    speakBalance() 
+                    location.href = 'view_balance.html';
+                } else {
+                   // alert('Command not recognized. Please try again.');
+                    speakOptionsAgain() ; // Repeat options if command not recognized
+                }
+            };
+
+            recognition.onerror = function(event) {
+               // alert('Error occurred in recognition: ' + event.error);
+                speakOptionsAgain() ; // Repeat options if there's an error
+            };
+
+            recognition.start();
+        }
+
+        // Function to speak the options and then start listening
+        function speakOptions() {
+            const optionsText = "Welcome to the bank dashboard. You can say 'Send Money', 'Withdraw Money', 'Deposit Money', or 'Balance'. What would you like to do?";
+            speak(optionsText, startVoiceCommand);
+        }
+        function speakOptionsAgain() {
+            const optionsText ="Please use the provided option. You can say 'Send Money', 'Withdraw Money', 'Deposit Money', or 'Balance'. What would you like to do?";
+            speak(optionsText, startVoiceCommand);
+        }
+ 
+         function speakBalance() {
+            const optionsText ="Your balance is "+balance +"Rand";
+            speak(optionsText, startVoiceCommand);
+        }
+
+        // Load dashboard data and speak options on page load
+        window.onload = function() {
+            loadDashboard();
+            speakOptions();
+        }
+    </script>
+</body>
+</html>

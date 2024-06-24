@@ -44,5 +44,32 @@ class myTools{
         return null; // or throw an exception
     }
 }
+
+function SaveClient($link, $VemailAddress) {
+    // Prepare a statement to retrieve user details by email address
+    $userSql = "SELECT id FROM UserDetails WHERE emailAddress = ?";
+    $userStmt = $link->prepare($userSql);
+    $userStmt->bind_param('s', $VemailAddress);
+    $userStmt->execute();
+    $resultUser = $userStmt->get_result();
+    
+    if ($resultUser->num_rows > 0) {
+        $loginDataId = $resultUser->fetch_assoc();
+        $user_id_client = $loginDataId['id'];
+
+        // Insert into CLient table
+        $stmt = $link->prepare("INSERT INTO CLient (user_id) VALUES (?)");
+        $stmt->bind_param("i", $user_id_client);
+
+        if ($stmt->execute()) {
+            return "New record created successfully";
+        } else {
+            return "Error: " . $stmt->error;
+        }
+    } else {
+        return "User not found";
+    }
+}
+
 }
 ?>

@@ -46,5 +46,8 @@ class UserAuthenticator {
       // echo "yes session started";
         exit;
     }
+
+    
+
 }
 ?>

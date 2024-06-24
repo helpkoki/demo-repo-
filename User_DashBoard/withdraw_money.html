@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Withdraw Money</title>
+</head>
+<body>
+    <h1>Withdraw Money</h1>
+    <form id="withdrawForm" action="api/withdraw.php" method="POST">
+        <label for="amount">Amount:</label>
+        <input type="text" id="amount" name="amount" required>
+        <button type="submit" style="display: none;">Withdraw</button> <!-- Hide the submit button -->
+    </form>
+
+    <div id="message"></div>
+
+    <script>
+        // Function to handle speech synthesis (text-to-speech)
+        function speak(text, callback) {
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.onend = callback;
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // Function to start speech recognition for amount input
+        function startRecognition() {
+            if (!('webkitSpeechRecognition' in window)) {
+                alert('Your browser does not support speech recognition. Please use Chrome or another supported browser.');
+                return;
+            }
+
+            var recognition = new webkitSpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.lang = 'en-US';
+
+            recognition.onresult = function(event) {
+                var amountField = document.getElementById('amount');
+                var transcript = event.results[0][0].transcript;
+                var amount = parseFloat(transcript.replace(/[^0-9.]/g, ''));
+
+                if (!isNaN(amount)) {
+                    amountField.value = amount.toFixed(2);
+                    showConfirmation(amount.toFixed(2));
+                } else {
+                    speak("I did not understand the amount. Please try again.", startRecognition);
+                }
+            };
+
+            recognition.onerror = function(event) {
+                alert('Error occurred in recognition: ' + event.error);
+                speak("An error occurred. Please try again.", startRecognition);
+            };
+
+            speak("Please say the amount you want to withdraw, for example, fifty dollars and twenty cents.", function() {
+                recognition.start();
+            });
+        }
+
+        // Function to show confirmation and proceed with withdrawal
+        function showConfirmation(amount) {
+            document.getElementById('amount').value = amount;
+            speak("You want to withdraw " + amount + " dollars. Confirm withdrawal by saying yes, or cancel by saying no.", function() {
+                var recognition = new webkitSpeechRecognition();
+                recognition.continuous = false;
+                recognition.interimResults = false;
+                recognition.lang = 'en-US';
+
+                recognition.onresult = function(event) {
+                    var transcript = event.results[0][0].transcript.toLowerCase();
+                    if (transcript.includes('yes')) {
+                        document.getElementById('withdrawForm').submit(); // Submit the form
+                    } else if (transcript.includes('no')) {
+                        speak("Withdrawal canceled.", null);
+                    } else {
+                        speak("I did not understand. Say yes to confirm or no to cancel.", function() {
+                            recognition.start();
+                        });
+                    }
+                };
+
+                recognition.onerror = function(event) {
+                    alert('Error occurred in recognition: ' + event.error);
+                    speak("An error occurred. Please try again.", function() {
+                        recognition.start();
+                    });
+                };
+
+                recognition.start();
+            });
+        }
+
+        // Start the withdrawal process with voice recognition on page load
+        window.onload = function() {
+            startRecognition();
+        };
+
+        // Handle form submission response
+        document.getElementById('withdrawForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            fetch('api/withdraw.php', {
+                method: 'POST',
+                body: new FormData(this)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    speak("Withdrawal successful. Remaining balance is " + data.balance.toFixed(2) + " dollars.", function() {
+                        window.location.href = 'dashboard.html'; // Redirect to dashboard.html
+                    });
+                } else {
+                    speak("Withdrawal failed. " + data.message);
+                }
+            })
+            .catch(error => {
+                speak("An error occurred while processing your request. Please try again later.");
+                console.error('Error:', error);
+            });
+        });
+    </script>
+</body>
+</html>

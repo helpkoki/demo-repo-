@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deposit Money</title>
+</head>
+<body>
+    <h1>Deposit Money</h1>
+    <form action="api/deposit_money.php" method="post" id="depositForm">
+        <label for="amount">Amount:</label>
+        <input type="number" step="0.01" id="amount" name="amount" required aria-label="Amount in dollars" role="textbox">
+        <div id="confirmation" style="display: none;">
+            <p id="confirmationMessage">Do you want to deposit <span id="confirmedAmount"></span> dollars?</p>
+        </div>
+    </form>
+
+    <script>
+        function speak(text, callback) {
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.onend = callback;
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function startRecognition() {
+            if (!('webkitSpeechRecognition' in window)) {
+                alert('Your browser does not support speech recognition. Please use Chrome or another supported browser.');
+                return;
+            }
+
+            var recognition = new webkitSpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.lang = 'en-US';
+
+            recognition.onresult = function(event) {
+                var amountField = document.getElementById('amount');
+                var transcript = event.results[0][0].transcript;
+                var amount = parseFloat(transcript.replace(/[^0-9.]/g, ''));
+
+                if (!isNaN(amount)) {
+                    amountField.value = amount.toFixed(2);
+                    showConfirmation(amount.toFixed(2));
+                } else {
+                    speak("I did not understand the amount. Please try again.", startRecognition);
+                }
+            };
+
+            recognition.onerror = function(event) {
+                alert('Error occurred in recognition: ' + event.error);
+                speak("An error occurred. Please try again.", startRecognition);
+            };
+
+            speak("Please say the amount you want to deposit, for example, twenty dollars and fifty cents.", function() {
+                recognition.start();
+            });
+        }
+
+        function showConfirmation(amount) {
+            document.getElementById('confirmedAmount').innerText = amount;
+            document.getElementById('confirmation').style.display = 'block';
+            speak("Do you want to deposit " + amount + " dollars? Say yes to confirm or no to cancel.", function() {
+                var recognition = new webkitSpeechRecognition();
+                recognition.continuous = false;
+                recognition.interimResults = false;
+                recognition.lang = 'en-US';
+
+                recognition.onresult = function(event) {
+                    var transcript = event.results[0][0].transcript.toLowerCase();
+                    if (transcript.includes('yes')) {
+                        document.getElementById('depositForm').submit();
+                    } else if (transcript.includes('no')) {
+                        document.getElementById('confirmation').style.display = 'none';
+                        speak("Deposit canceled.", null);
+                    } else {
+                        speak("I did not understand. Say yes to confirm or no to cancel.", function() {
+                            recognition.start();
+                        });
+                    }
+                };
+
+                recognition.onerror = function(event) {
+                    alert('Error occurred in recognition: ' + event.error);
+                    speak("An error occurred. Please try again.", function() {
+                        recognition.start();
+                    });
+                };
+
+                recognition.start();
+            });
+        }
+
+        window.onload = startRecognition;
+    </script>
+</body>
+</html>

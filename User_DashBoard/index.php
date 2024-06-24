@@ -18,7 +18,7 @@ session_start();
     <body class="sb-nav-fixed">
         <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
             <!-- Navbar Brand-->
-            <a class="navbar-brand ps-3" href="index.html">Lass MT</a>
+            <a class="navbar-brand ps-3" href="index.html"><?php echo $_SESSION['username'];?></a>
             <!-- Sidebar Toggle-->
             <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i class="fas fa-bars"></i></button>
             <!-- Navbar Search-->
@@ -59,9 +59,9 @@ session_start();
 								<!--Pages Removed  end-->
                             <div class="sb-sidenav-menu-heading">Tables</div>
                            
-                            <a class="nav-link" href="tables.html">
+                            <a class="nav-link" href="dashboard.html">
                                 <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
-                                Orders
+                                BANK
                             </a>
                         </div>
                     </div>
@@ -72,7 +72,7 @@ session_start();
             } else {
                 echo "Guest";
             }
-                        
+           // require 'api/withdraw.php';
                         ?>
                         </div>
                         

@@ -51,3 +51,43 @@ CREATE TABLE images (
 
 );
 
+version 2
+
+CREATE DATABASE bankApp;
+
+USE bankApp;
+
+CREATE TABLE UserDetails (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    firstName VARCHAR(50) NOT NULL,
+    lastName VARCHAR(50) NOT NULL,
+    birthday DATE NOT NULL,
+    gender ENUM('female', 'male', 'other') NOT NULL,
+    emailAddress VARCHAR(100) NOT NULL,
+    phoneNumber VARCHAR(10) NOT NULL,
+    idNumber VARCHAR(10) NOT NULL
+);
+
+CREATE TABLE Login (
+    login_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES UserDetails(id),
+    UNIQUE (email)
+);
+
+CREATE TABLE Transactions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
+    type ENUM('send', 'receive', 'deposit') NOT NULL,
+    amount DECIMAL(10, 2) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES UserDetails(id)
+);
+
+CREATE TABLE client(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
+    balance DECIMAL(16,2)
+);

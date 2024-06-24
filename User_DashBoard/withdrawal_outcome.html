@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Withdrawal Outcome</title>
+</head>
+<body>
+    <div id="message"></div>
+     <h1 id="messagea"></h1>
+     <h1 id="success"></h1>
+
+    <script>
+        
+        // Function to handle speech synthesis (text-to-speech)
+function speak(text, callback) {
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.onend = callback;
+    window.speechSynthesis.speak(utterance);
+}
+
+// Function to start speech recognition for confirmation
+function startRecognition() {
+    if (!('webkitSpeechRecognition' in window)) {
+        alert('Your browser does not support speech recognition. Please use Chrome or another supported browser.');
+        return;
+    }
+
+    var recognition = new webkitSpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = 'en-US';
+
+    recognition.onresult = function(event) {
+        var transcript = event.results[0][0].transcript.toLowerCase();
+        if (transcript.includes('ok') || transcript.includes('confirm')) {
+            window.location.href = 'dashboard.html'; // Redirect to dashboard or home page after withdrawal
+        } else {
+            speak("Withdrawal canceled. Thank you.", null);
+        }
+    };
+
+    recognition.onerror = function(event) {
+        alert('Error occurred in recognition: ' + event.error);
+        speak("An error occurred. Please try again.", startRecognition);
+    };
+
+    speak("Withdrawal successful. Say OK to return to dashboard or Confirm to return to dashboard.", function() {
+        recognition.start();
+    });
+}
+
+// Display withdrawal outcome message
+document.addEventListener('DOMContentLoaded', function() {
+            var urlParams = new URLSearchParams(window.location.search);
+            var success = urlParams.get('success');
+            var message = urlParams.get('message');
+
+            let response =fetch('api/withdraw.php');
+            let data =response.json();
+
+
+            console.log(success)
+            console.log('Withdrawal successful. '+message)
+            var messageDiv = document.getElementById('message');
+            if (success === 'true') {
+                messageDiv.textContent = 'Withdrawal successful. ' + message;
+            } else {
+                messageDiv.textContent = 'Withdrawal failed.  ' + message +'  success:'+data.success;
+            }
+        });
+        
+    
+
+    </script>
+</body>
+</html>
